@@ -83,3 +83,16 @@ func TestPhpToJsonObject(t *testing.T) {
 		println(string(obj))
 	}
 }
+
+func TestSerialisedObject(t *testing.T) {
+	data := `C:26:"Transfer_Sales_Order_Stock":80:{a:3:{s:12:"id_warehouse";s:1:"1";s:8:"quantity";s:1:"5";s:7:"_locale";s:2:"en";}}`
+	obj, err := PhpToJson([]byte(data))
+	if err != nil {
+		t.Error(err)
+	}
+	jsonStr := `{"Transfer_Sales_Order_Stock":{"_locale":"en","id_warehouse":"1","quantity":"5"}}`
+	if string(obj) != jsonStr {
+		t.Error("convert serialised object to json obejct error")
+		println(string(obj))
+	}
+}

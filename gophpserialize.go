@@ -181,6 +181,38 @@ func (s *Serializer) readValue() interface{} {
 		s.move()
 		return r
 	}
+	// Serialised object
+	if objType == 'C' {
+		s.move()
+		size := s.readInt()
+		s.move()
+		key := s.readString(size)
+		s.move()
+		s.readInt()
+		s.move()
+
+		// object content open
+		s.move()
+
+		r:= make(map[string]interface{})
+		v := s.readValue()
+
+		if vmap, ok := v.(map[string]interface{}); ok {
+			r[key] = vmap
+		}
+
+		// object content close }
+		s.move()
+		return r
+	}
+	if objType == '{' {
+		s.move()
+		return nil
+	}
+	if objType == '}' {
+		s.move()
+		return nil
+	}
 	panic("Unknown objType: " + string(objType) + "\n" + string(s.raw))
 }
 

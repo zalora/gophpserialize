@@ -2,6 +2,7 @@ package gophpserialize
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -194,7 +195,7 @@ func (s *Serializer) readValue() interface{} {
 		// object content open
 		s.move()
 
-		r:= make(map[string]interface{})
+		r := make(map[string]interface{})
 		v := s.readValue()
 
 		if vmap, ok := v.(map[string]interface{}); ok {
@@ -220,14 +221,22 @@ func (s *Serializer) move() {
 	s.pos += 1
 }
 
-func Unmarshal(data []byte) interface{} {
+func Unmarshal(data []byte) (rv interface{}, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Cant Unmarshal data %v, error: %v", data, r)
+		}
+	}()
 	s := new(Serializer)
 	s.SetRaw(data)
-	return s.readValue()
+	return s.readValue(), nil
 }
 
 func PhpToJson(phpData []byte) (jsonData []byte, err error) {
-	r := Unmarshal(phpData)
+	r, err := Unmarshal(phpData)
+	if err != nil {
+		return nil, err
+	}
 	jsonData, err = json.Marshal(r)
 	return
 }

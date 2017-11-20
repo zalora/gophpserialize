@@ -1,13 +1,26 @@
 package gophpserialize
 
 import (
-"testing"
+	"strings"
+	"testing"
 )
+
+func TestUnmarshalEMpty(t *testing.T) {
+	data := []byte("")
+	if _, err := Unmarshal(data); err == nil {
+		t.Fail()
+	} else {
+		if !strings.Contains(err.Error(), "Cant Unmarshal data") {
+			t.Error(err)
+		}
+	}
+}
 
 func TestUnmarshal(t *testing.T) {
 	data := `a:3:{s:5:"apple";i:1;s:6:"orange";i:2;s:5:"grape";i:3;}`
 
-	obj := Unmarshal([]byte(data)).(map[string]interface{})
+	r, _ := Unmarshal([]byte(data))
+	obj := r.(map[string]interface{})
 
 	if obj["apple"] != 1 {
 		t.Error("Unmarshal failed")
@@ -20,17 +33,16 @@ func TestUnmarshal(t *testing.T) {
 	}
 
 	data = `a:1:{s:7:"catalog";a:3:{i:2;a:4:{s:5:"width";s:3:"236";s:6:"height";s:3:"345";s:7:"quality";s:2:"90";s:13:"image_formats";s:3:"jpg";}i:1;a:4:{s:5:"width";s:3:"160";s:6:"height";s:3:"160";s:7:"quality";s:2:"80";s:13:"image_formats";s:3:"jpg";}i:3;a:4:{s:5:"width";s:3:"160";s:6:"height";s:3:"160";s:7:"quality";s:2:"80";s:13:"image_formats";s:3:"jpg";}}`
-	obj = Unmarshal([]byte(data)).(map[string]interface{})
-        if _, hasV := obj["catalog"].(map[string]interface{})["0"]; hasV ==true {
-           t.Error("Unmarshal failed")
-        }
+	r, _ = Unmarshal([]byte(data))
+	obj = r.(map[string]interface{})
+	if _, hasV := obj["catalog"].(map[string]interface{})["0"]; hasV == true {
+		t.Error("Unmarshal failed")
+	}
 }
 
 func TestPhpToJson(t *testing.T) {
 	data := `a:3:{s:5:"apple";i:1;s:6:"orange";i:2;s:5:"grape";i:3;}`
-
 	obj, err := PhpToJson([]byte(data))
-
 	jsonStr := `{"apple":1,"grape":3,"orange":2}`
 
 	if err != nil {

@@ -2,7 +2,7 @@ package gophpserialize
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -224,7 +224,7 @@ func (s *Serializer) move() {
 func Unmarshal(data []byte) (rv interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cant Unmarshal data %v, error: %v", data, r)
+			err = fmt.Errorf("Cant Unmarshal data %v, error: %v", data, r)
 		}
 	}()
 	s := new(Serializer)
